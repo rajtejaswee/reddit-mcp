@@ -68,7 +68,7 @@ async function main() {
 
     server.tool(
         "get_post_comments",
-        "Get comments for a specific Reddit post. URL format should be: /r/subreddit/comments/id/title/"
+        "Get comments for a specific Reddit post. URL format should be: /r/subreddit/comments/id/title/",
         {
             permalink: z.string().describe("The permalink path of the post (e.g. /r/reactjs/comments/123/title/)")
         },
@@ -94,7 +94,7 @@ async function main() {
                     isError: true
                 }
             }
-        })
+        }
     )
 
     await server.connect(transport);

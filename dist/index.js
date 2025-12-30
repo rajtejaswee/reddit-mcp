@@ -46,6 +46,28 @@ async function main() {
             };
         }
     });
+    server.tool("get_post_comments", "Get comments for a specific Reddit post. URL format should be: /r/subreddit/comments/id/title/", {
+        permalink: z.string().describe("The permalink path of the post (e.g. /r/reactjs/comments/123/title/)")
+    }, async ({ permalink }) => {
+        try {
+            const comments = await RedditService.getPostComments(permalink);
+            if (comments.length === 0) {
+                return {
+                    content: [{ type: "text", text: "No comments found" }]
+                };
+            }
+            const formattedComments = comments.join("\n");
+            return {
+                content: [{ type: "text", text: formattedComments }]
+            };
+        }
+        catch (error) {
+            return {
+                content: [{ type: "text", text: `Error: ${error.message}` }],
+                isError: true
+            };
+        }
+    });
     await server.connect(transport);
     console.error("Reddit MCP Server running on Studio");
 }

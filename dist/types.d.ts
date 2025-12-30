@@ -16,4 +16,17 @@ export interface RedditResponse {
         children: RedditPost[];
     };
 }
+export interface RedditComment {
+    data: {
+        id: string;
+        author: string;
+        body: string;
+        score: number;
+        replies?: {
+            data: {
+                children: RedditComment[];
+            };
+        } | "";
+    };
+}
 //# sourceMappingURL=types.d.ts.map

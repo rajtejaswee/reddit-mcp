@@ -1,4 +1,4 @@
-import { RedditService } from "./services/reddit.js";
+import { RedditService } from "../services/reddit.js";
 
 async function test() {
     console.log("Fetching data")
