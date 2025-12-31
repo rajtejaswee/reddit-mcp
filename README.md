@@ -139,10 +139,10 @@ if (cached && (now - cached.timestamp < CACHE_TTL)) {
 
 ```
 src/
-├── index.ts              # Entry point (The "Waiter" - MCP Server)
-├── types.ts              # TypeScript Interfaces (The "Menu")
+├── index.ts              # Entry point (The - MCP Server)
+├── types.ts              # TypeScript Interfaces 
 ├── services/
-│   └── reddit.ts         # Business Logic & Caching (The "Kitchen")
+│   └── reddit.ts         # Business Logic & Caching 
 └── utils/
     └── parseComments.ts  # Recursive Tree Parser
 ```
@@ -153,12 +153,6 @@ src/
 - **`types.ts`**: TypeScript type definitions and interfaces
 - **`services/reddit.ts`**: Core business logic with in-memory caching
 - **`utils/parseComments.ts`**: DFS algorithm for parsing nested comment trees
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
 
 ---
 
