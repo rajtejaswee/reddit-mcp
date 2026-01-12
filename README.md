@@ -1,4 +1,5 @@
-# Reddit MCP Server 🤖
+# Reddit MCP Server [![Reddit](https://img.shields.io/badge/Reddit-FF4500?logo=reddit&logoColor=white)](https://www.reddit.com) 
+
 
 A robust **Model Context Protocol (MCP)** server that bridges **Claude AI** with Reddit.
 This tool allows AI agents to search Reddit, fetch live discussions, and recursively parse nested comment threads, all while handling rate limits via an intelligent caching layer.
