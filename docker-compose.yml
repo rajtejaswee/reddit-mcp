@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  # The Database
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data # Persist data even if container stops
+
+volumes:
+  redis_data:

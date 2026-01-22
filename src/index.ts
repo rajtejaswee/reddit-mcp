@@ -1,12 +1,31 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {z} from "zod";
 import { RedditService } from "./services/reddit.js";
+import { PublicClient } from "./services/publicClient.js";
+import { MemoryCache } from "./services/memoryCache.js";
+import { RedisCache } from "./services/redisCache.js";
+import { ICache } from "./types/types.js";
+import { config } from "./config.js";
+import { logger } from "./utils/logger.js";
 
-const server = new McpServer({
+const redditClient = new PublicClient();
+let redditCache: ICache
+
+if(config.redis.url) {
+    redditCache = new RedisCache(config.redis.url)
+    logger.info("Using Redis Cache")
+} else {
+    redditCache = new MemoryCache();
+    logger.info("Using Memory Cache")
+}
+
+const redditService = new RedditService(redditClient, redditCache)
+const server = new McpServer ({
     name: "reddit-mcp",
     version: "1.0.0"
-});
+})
 
 const transport = new StdioServerTransport();
 
@@ -19,7 +38,7 @@ async function main() {
         },
         async ({subreddit}) => {
             try {
-                const post = await RedditService.getSubredditPosts(subreddit);
+                const post = await redditService.getSubredditPosts(subreddit);
 
                 const formatted = post.map(p => {
                     return `[${p.data.score} upvotes] ${p.data.title} (ID: ${p.data.id})`;
@@ -47,8 +66,7 @@ async function main() {
 
         async ({query}) => {
             try {
-                const post = await RedditService.searchReddit(query)
-
+                const post = await redditService.searchReddit(query);
                 const formatted = post.map(p => {
                     return `[${p.data.score} upvotes] ${p.data.title} (Subreddit: ${p.data.subreddit}) (ID: ${p.data.id})`
                 }).join("\n")
@@ -75,7 +93,7 @@ async function main() {
 
         async ({permalink}) => {
             try {
-                const comments = await RedditService.getPostComments(permalink)
+                const comments = await redditService.getPostComments(permalink);
 
                 if(comments.length === 0) {
                     return {

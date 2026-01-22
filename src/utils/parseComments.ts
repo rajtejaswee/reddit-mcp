@@ -1,4 +1,4 @@
-import type { RedditComment } from "../types.js"
+import type { RedditComment } from "../types/types.js"
 
 export default function parseComments(comments: RedditComment[], depth = 0) : string[] {
 

@@ -33,3 +33,11 @@ export interface RedditComment {
   };
 }
 
+export interface IRedditClient {
+  fetch<T>(url: string) : Promise<T>;
+}
+
+export interface ICache {
+  get<T>(key: string) : Promise<T | null>
+  set<T>(key: string, value: T, ttl?: number) : Promise<void>
+}
