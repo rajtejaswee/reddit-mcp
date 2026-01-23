@@ -1,0 +1,5 @@
+{
+  "/icon/route": "app-edge-has-no-entrypoint",
+  "/page": "app/page.js",
+  "/privacy/page": "app/privacy/page.js"
+}

@@ -1,0 +1,56 @@
+{
+  "sorted_middleware": [
+    "/icon/route"
+  ],
+  "middleware": {},
+  "instrumentation": null,
+  "functions": {
+    "/icon/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/interception-route-rewrite-manifest.js",
+        "server/server-reference-manifest.js",
+        "server/app/icon/route_client-reference-manifest.js",
+        "server/edge/chunks/web__next-internal_server_app_icon_route_actions_aab198b5.js",
+        "server/edge/chunks/2374f_next_dist_esm_f9bf894c._.js",
+        "server/edge/chunks/2374f_next_dist_compiled_react-server-dom-turbopack_b7068caf._.js",
+        "server/edge/chunks/2374f_next_dist_compiled_@vercel_og_760cff75._.js",
+        "server/edge/chunks/2374f_next_dist_compiled_659f4999._.js",
+        "server/edge/chunks/2374f_next_dist_a2d15078._.js",
+        "server/edge/chunks/[root-of-the-server]__5a880ccc._.js",
+        "server/edge/chunks/cb4a7_next_dist_esm_build_templates_edge-wrapper_e6eb9e45.js"
+      ],
+      "name": "app/icon/route",
+      "page": "/icon/route",
+      "matchers": [
+        {
+          "regexp": "^/icon(?:/)?$",
+          "originalSource": "/icon"
+        }
+      ],
+      "wasm": [
+        {
+          "name": "wasm_fdb56e4cc5936d29",
+          "filePath": "server/edge/chunks/2374f_next_dist_compiled_@vercel_og_resvg_23ace1ce.wasm"
+        },
+        {
+          "name": "wasm_1ccdc983b1fd9f87",
+          "filePath": "server/edge/chunks/2374f_next_dist_compiled_@vercel_og_yoga_23ace1ce.wasm"
+        }
+      ],
+      "assets": [
+        {
+          "name": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf",
+          "filePath": "server/edge/assets/noto-sans-v27-latin-regular.bdfa676c.ttf"
+        }
+      ],
+      "env": {
+        "__NEXT_BUILD_ID": "development",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": "/Hzl99Gf1McL3zBryaCVFeZH5fMHl+SftqKDO0ZY8/8=",
+        "__NEXT_PREVIEW_MODE_ID": "8dec2bd6caae772137cf38921ae8a2c0",
+        "__NEXT_PREVIEW_MODE_ENCRYPTION_KEY": "e268880455c2c22b21c9602433192f076b9d0ed12fb18050d761960b7c9da29a",
+        "__NEXT_PREVIEW_MODE_SIGNING_KEY": "999a60037bec5eff54287e069b7eee0713bf716759e279b2af77b49a3da35f76"
+      }
+    }
+  }
+}
