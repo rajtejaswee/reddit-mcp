@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x] # Test on Node 18 and 20
+
+    steps:
+    # Download code
+    - uses: actions/checkout@v3
+
+    # 2. Install Node.js
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    # Backend Check
+    - name: Install Backend Deps
+      run: npm ci 
+    
+    - name: Build Backend
+      run: npm run build
+
+    # 4. Frontend Check
+    - name: Install Frontend Deps
+      working-directory: ./web
+      run: npm ci
+    
+    - name: Build Frontend
+      working-directory: ./web
+      run: npm run build
