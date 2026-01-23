@@ -1,6 +1,6 @@
 {
   "name": "@rajtejaswee/reddit-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimalist, privacy-focused Reddit search engine server.",
   "main": "index.js",
   "type": "module",
@@ -18,7 +18,12 @@
     "type": "git",
     "url": "git+https://github.com/rajtejaswee/reddit-mcp.git"
   },
-  "keywords": ["mcp", "reddit", "search", "api"],
+  "keywords": [
+    "mcp",
+    "reddit",
+    "search",
+    "api"
+  ],
   "author": "Raj Tejaswee",
   "license": "MIT",
   "files": [
