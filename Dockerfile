@@ -1,38 +1,21 @@
-# --- Stage 1: Builder ---
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy config files first
-COPY package*.json tsconfig*.json ./
+# Copy dependency definitions
+COPY package.json package-lock.json ./
 
-# Install ALL dependencies (including devDependencies for 'tsc')
+# Install dependencies
 RUN npm ci
 
 # Copy source code
-COPY src ./src
+COPY . .
 
-# Build TypeScript -> JavaScript
+# Build TypeScript
 RUN npm run build
 
-# --- Stage 2: Runner ---
-FROM node:20-alpine AS runner
+# Expose port
+EXPOSE 3000
 
-WORKDIR /app
-
-# Set production env
-ENV NODE_ENV=production
-
-# Install ONLY production dependencies (saves space)
-COPY package*.json ./
-RUN npm ci --only=production
-
-# Copy built JS from Stage 1
-COPY --from=builder /app/dist ./dist
-
-# Create a non-root user (Security Best Practice)
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-# Start
-CMD ["node", "dist/index.js"]
+# Start command
+CMD ["npm", "run", "serve"]

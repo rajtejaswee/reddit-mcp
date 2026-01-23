@@ -1,5 +1,5 @@
 import axios from "axios";
-import {config} from "../config.js"
+import {config} from "../utils/config.js"
 import type { IRedditClient } from "../types/types.js";
 import { error } from "node:console";
 

@@ -1,68 +1,97 @@
-import axios from "axios";
 import parseComments from "../utils/parseComments.js";
-const CACHE_TL = 5 * 60 * 1000;
+import { logger } from "../utils/logger.js";
 export class RedditService {
-    static base_url = 'https://www.reddit.com';
-    static cache = new Map();
-    static async fetchWithCache(url) {
-        const now = Date.now();
-        const cached = this.cache.get(url);
-        if (cached && (now - cached.timestamp < CACHE_TL)) {
-            console.error(`[CACHE HIT] Serving from memory : ${url}`);
-            return cached.data;
-        }
-        console.error(`[CACHE MISS] Fetching the API : ${url}`);
-        const response = await axios.get(url, {
-            headers: {
-                "User-Agent": "reddit-mcp-client/1.0"
-            }
-        });
-        this.cache.set(url, {
-            data: response.data,
-            timestamp: now
-        });
-        return response.data;
+    static BASE_URL = 'https://www.reddit.com';
+    static CACHE_TTL = 5 * 60 * 1000;
+    cache;
+    client;
+    constructor(client, cache) {
+        this.client = client;
+        this.cache = cache;
     }
-    static async getSubredditPosts(subreddit) {
+    async fetchWithCache(url) {
+        const start = Date.now();
+        // 1. Try Cache
+        const cached = await this.cache.get(url);
+        if (cached) {
+            logger.info({
+                event: "cache_hit",
+                url,
+                duration: Date.now() - start
+            }, "Serving from memory");
+            return cached;
+        }
+        logger.info({ event: "cache_miss", url }, "Fetching via Client");
         try {
-            const url = `${this.base_url}/r/${subreddit}/hot.json?limit=100`;
-            const response = await this.fetchWithCache(url);
-            return response.data.children;
+            const data = await this.client.fetch(url);
+            await this.cache.set(url, data, RedditService.CACHE_TTL);
+            logger.debug({
+                event: "fetch_success",
+                url,
+                duration: Date.now() - start
+            }, "Request completed");
+            return data;
         }
         catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(`Failed to fetch the subreddit: ${error.message}`);
-            }
+            logger.error({
+                event: "fetch_error",
+                url,
+                error: error.message
+            }, "Failed to fetch data");
             throw error;
         }
     }
-    static async searchReddit(query) {
-        try {
-            const safeQuery = encodeURIComponent(query);
-            const url = `${this.base_url}/search.json?q=${safeQuery}&limit=100`;
-            const response = await this.fetchWithCache(url);
-            return response.data.children;
-        }
-        catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(`Failed to fetch the search reddit: ${error.message}`);
-            }
-            throw error;
-        }
+    async getSubredditPosts(subreddit) {
+        const url = `${RedditService.BASE_URL}/r/${subreddit}/hot.json?limit=500`;
+        const response = await this.fetchWithCache(url);
+        return response.data.children.map((child) => ({
+            title: child.data.title,
+            url: `${RedditService.BASE_URL}${child.data.permalink}`,
+            author: child.data.author,
+            score: child.data.score || 0,
+            num_comments: child.data.num_comments || 0,
+            created_utc: child.data.created_utc
+        }));
     }
-    static async getPostComments(permalink) {
-        try {
-            const url = `${this.base_url}${permalink}.json`;
-            const response = await this.fetchWithCache(url);
-            const commentData = response[1].data.children;
-            return parseComments(commentData);
+    async searchReddit(query, sort = 'relevance') {
+        const safeQuery = encodeURIComponent(query);
+        let apiSort = sort;
+        let timeFrame = 'all';
+        let limit = 50;
+        if (sort === 'relevance') {
+            timeFrame = 'year';
+            apiSort = 'relevance';
         }
-        catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(`Failed to fetch comments ${error.message}`);
-            }
-            throw error;
+        else if (sort === 'top') {
+            timeFrame = 'all';
+            apiSort = 'top';
         }
+        else if (sort === 'comments') {
+            timeFrame = 'all';
+            apiSort = 'relevance';
+            limit = 100;
+        }
+        const url = `${RedditService.BASE_URL}/search.json?q=${safeQuery}&limit=${limit}&sort=${apiSort}&t=${timeFrame}`;
+        const response = await this.fetchWithCache(url);
+        let posts = response.data.children.map((child) => ({
+            title: child.data.title,
+            url: `${RedditService.BASE_URL}${child.data.permalink}`,
+            author: child.data.author,
+            score: child.data.score || 0,
+            num_comments: child.data.num_comments || 0,
+            created_utc: child.data.created_utc
+        }));
+        if (sort === 'comments') {
+            posts.sort((a, b) => b.num_comments - a.num_comments);
+            posts = posts.slice(0, 50);
+        }
+        return posts;
+    }
+    async getPostComments(permalink) {
+        const url = `${RedditService.BASE_URL}${permalink}.json`;
+        const response = await this.fetchWithCache(url);
+        const commentData = response[1].data.children;
+        return parseComments(commentData);
     }
 }
 //# sourceMappingURL=reddit.js.map

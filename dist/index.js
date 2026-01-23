@@ -1,7 +1,25 @@
+#!/usr/bin/env node
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { RedditService } from "./services/reddit.js";
+import { PublicClient } from "./services/publicClient.js"; // Ensure filename matches
+import { MemoryCache } from "./services/memoryCache.js";
+import { RedisCache } from "./services/redisCache.js";
+import { config } from "./config.js";
+import { logger } from "./utils/logger.js";
+// Initialize Dependencies
+const redditClient = new PublicClient();
+let redditCache;
+if (config.redis.url) {
+    redditCache = new RedisCache(config.redis.url);
+    logger.info("Using Redis Cache");
+}
+else {
+    redditCache = new MemoryCache();
+    logger.info("Using Memory Cache");
+}
+const redditService = new RedditService(redditClient, redditCache);
 const server = new McpServer({
     name: "reddit-mcp",
     version: "1.0.0"
@@ -12,10 +30,11 @@ async function main() {
         subreddit: z.string().describe("The name of the subreddit (eg: 'reactjs')")
     }, async ({ subreddit }) => {
         try {
-            const post = await RedditService.getSubredditPosts(subreddit);
-            const formatted = post.map(p => {
-                return `[${p.data.score} upvotes] ${p.data.title} (ID: ${p.data.id})`;
-            }).join("\n");
+            const posts = await redditService.getSubredditPosts(subreddit);
+            // 🛠️ FIX: Removed .data accessors. Properties are now direct.
+            const formatted = posts.map(p => {
+                return `[${p.score} upvotes] ${p.title} (Author: ${p.author})\nLink: ${p.url}`;
+            }).join("\n\n");
             return {
                 content: [{ type: "text", text: formatted }],
             };
@@ -31,10 +50,11 @@ async function main() {
         query: z.string().describe("The search keywords (eg: 'Reactjs 19 release')"),
     }, async ({ query }) => {
         try {
-            const post = await RedditService.searchReddit(query);
-            const formatted = post.map(p => {
-                return `[${p.data.score} upvotes] ${p.data.title} (Subreddit: ${p.data.subreddit}) (ID: ${p.data.id})`;
-            }).join("\n");
+            const posts = await redditService.searchReddit(query);
+            // 🛠️ FIX: Removed .data accessors here too.
+            const formatted = posts.map(p => {
+                return `[${p.score} upvotes] ${p.title} (Author: ${p.author})\nLink: ${p.url}`;
+            }).join("\n\n");
             return {
                 content: [{ type: "text", text: formatted }]
             };
@@ -46,11 +66,11 @@ async function main() {
             };
         }
     });
-    server.tool("get_post_comments", "Get comments for a specific Reddit post. URL format should be: /r/subreddit/comments/id/title/", {
-        permalink: z.string().describe("The permalink path of the post (e.g. /r/reactjs/comments/123/title/)")
+    server.tool("get_post_comments", "Get comments for a specific Reddit post.", {
+        permalink: z.string().describe("The permalink path of the post")
     }, async ({ permalink }) => {
         try {
-            const comments = await RedditService.getPostComments(permalink);
+            const comments = await redditService.getPostComments(permalink);
             if (comments.length === 0) {
                 return {
                     content: [{ type: "text", text: "No comments found" }]
@@ -69,10 +89,10 @@ async function main() {
         }
     });
     await server.connect(transport);
-    console.error("Reddit MCP Server running on Studio");
+    logger.info("Reddit MCP Server running on Stdio"); // Use logger instead of console.error
 }
 main().catch((error) => {
-    console.error("Fatal error", error);
+    logger.fatal({ error }, "Fatal server error");
     process.exit(1);
 });
 //# sourceMappingURL=index.js.map

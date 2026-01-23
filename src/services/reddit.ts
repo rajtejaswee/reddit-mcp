@@ -1,4 +1,3 @@
-import axios from "axios";
 import type { IRedditClient, RedditResponse, RedditPost, ICache } from "../types/types.js"
 import parseComments from "../utils/parseComments.js";
 import {logger} from "../utils/logger.js"
@@ -30,13 +29,10 @@ export class RedditService {
             return cached;
         }
 
-        // 2. Fetch if missing
         logger.info({ event: "cache_miss", url }, "Fetching via Client");
         
         try {
             const data = await this.client.fetch<T>(url);
-            
-            // 3. Save to Cache
             await this.cache.set(url, data, RedditService.CACHE_TTL);
             
             logger.debug({ 
@@ -59,14 +55,52 @@ export class RedditService {
     async getSubredditPosts(subreddit: string): Promise<RedditPost[]> {
         const url = `${RedditService.BASE_URL}/r/${subreddit}/hot.json?limit=500`;
         const response = await this.fetchWithCache<RedditResponse>(url);
-        return response.data.children;
+        return response.data.children.map((child: any) => ({
+            title: child.data.title,
+            url: `${RedditService.BASE_URL}${child.data.permalink}`,
+            author: child.data.author,
+            score: child.data.score || 0,       
+            num_comments: child.data.num_comments || 0, 
+            created_utc: child.data.created_utc
+        }));
     }
 
-    async searchReddit(query: string): Promise<RedditPost[]> {
+   async searchReddit(query: string, sort: 'relevance' | 'top' | 'comments' = 'relevance'): Promise<RedditPost[]> {
         const safeQuery = encodeURIComponent(query);
-        const url = `${RedditService.BASE_URL}/search.json?q=${safeQuery}&limit=500`;
+        
+        let apiSort = sort;
+        let timeFrame = 'all';
+        let limit = 50;
+        if (sort === 'relevance') {
+            timeFrame = 'year';       
+            apiSort = 'relevance';
+        } 
+        else if (sort === 'top') {
+            timeFrame = 'all';        
+            apiSort = 'top';
+        }
+        else if (sort === 'comments') {
+            timeFrame = 'all';
+            apiSort = 'relevance';    
+            limit = 100;              
+        }
+
+        const url = `${RedditService.BASE_URL}/search.json?q=${safeQuery}&limit=${limit}&sort=${apiSort}&t=${timeFrame}`;
         const response = await this.fetchWithCache<RedditResponse>(url);
-        return response.data.children;
+        let posts = response.data.children.map((child: any) => ({
+            title: child.data.title,
+            url: `${RedditService.BASE_URL}${child.data.permalink}`,
+            author: child.data.author,
+            score: child.data.score || 0,
+            num_comments: child.data.num_comments || 0,
+            created_utc: child.data.created_utc
+        }));
+        if (sort === 'comments') {
+            posts.sort((a: any, b: any) => b.num_comments - a.num_comments);
+            posts = posts.slice(0, 50); 
+        }
+
+        return posts;
     }
 
     async getPostComments(permalink: string): Promise<string[]> {

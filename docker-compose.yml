@@ -4,10 +4,33 @@ services:
   # The Database
   redis:
     image: redis:alpine
+    container_name: reddit-mcp-redis
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data # Persist data even if container stops
+    restart: always
 
-volumes:
-  redis_data:
+  # The Backend API
+  api:
+    build: .
+    container_name: reddit-mcp-api
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PORT=3000
+      - NODE_ENV=production
+      # - REDDIT_USER_AGENT=... (Optional, defaults to config)
+    depends_on:
+      - redis
+
+  # The Frontend UI
+  web:
+    build: 
+      context: ./web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:3000
+    container_name: reddit-mcp-web
+    ports:
+      - "3001:3000" # Maps container port 3000 to your machine's 3001
+    depends_on:
+      - api

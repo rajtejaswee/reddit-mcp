@@ -1,20 +1,26 @@
 export interface RedditPost {
-    data : {
-        id: string;
-        title: string;
-        selftext: string;
-        url: string;
-        author: string;
-        score: number;
-        num_comments: number;
-        created_utc:number;
-        subreddit: string;
-    };
+    title: string;
+    url: string;
+    author: string;
+    score: number;
+    num_comments: number;
+    created_utc: number;
 }
 
 export interface RedditResponse {
     data: {
-        children: RedditPost[];
+        children: {
+            data: {
+                title: string;
+                url: string;
+                author: string;
+                score?: number;
+                ups?: number;
+                num_comments?: number;
+                created_utc: number;
+                [key: string]: any;
+            }
+        }[];
     }
 }
 
