@@ -51,6 +51,7 @@ export default function Home() {
     inputRef.current?.focus();
   };
 
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const executeSearch = async (searchQuery: string, searchSort: SortOption) => {
     if (!searchQuery.trim()) return;
 
@@ -60,7 +61,7 @@ export default function Home() {
     setError(""); 
 
     try {
-      const res = await fetch(`http://localhost:3000/api/search?q=${searchQuery}&sort=${searchSort}`);
+      const res = await fetch(`${API_BASE}/api/search?q=${searchQuery}&sort=${searchSort}`);
       const json = await res.json();
 
       if (!res.ok) {
