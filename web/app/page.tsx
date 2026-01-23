@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Github, Linkedin, ExternalLink, MessageSquare, ArrowUp, Flame, X as CloseIcon, Zap, Trophy, MessageCircle, Loader2, AlertCircle, FileText, Server } from "lucide-react";
+import { Search, Github, Linkedin, Coffee, ExternalLink, MessageSquare, ArrowUp, Flame, X as CloseIcon, Zap, Trophy, MessageCircle, Loader2, AlertCircle, FileText, Server } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -51,7 +51,9 @@ export default function Home() {
     inputRef.current?.focus();
   };
 
+  // Safe fallback for API URL
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  
   const executeSearch = async (searchQuery: string, searchSort: SortOption) => {
     if (!searchQuery.trim()) return;
 
@@ -105,7 +107,7 @@ export default function Home() {
             <span className="font-bold text-lg tracking-tight">Reddit<span className="text-orange-500">MCP</span></span>
           </div>
 
-          {/* 🛠️ FIX: Socials - Icons Only, Updated Order */}
+          {/* Socials */}
           <div className="flex items-center gap-5">
             <SocialLink 
               href="https://www.linkedin.com/in/raj-tejaswee-147603247/" 
@@ -115,7 +117,6 @@ export default function Home() {
             <SocialLink 
               href="https://x.com/raj_tejaswee" 
               icon={
-                // Custom SVG for the authentic X logo
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
@@ -150,7 +151,19 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20, height: 0 }}
                   transition={{ duration: 0.2 }}
+                  className="flex flex-col items-center"
                 >
+                  {/* ☕ NEW: Buy Me a Coffee Pill */}
+                  <a 
+                    href="https://buymeacoffee.com/rajtejaswee" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FFDD00]/10 border border-[#FFDD00]/20 text-[#FFDD00] hover:bg-[#FFDD00]/20 transition-all text-sm font-medium mb-8 hover:scale-105"
+                  >
+                    <Coffee size={14} fill="currentColor" />
+                    <span>Buy me a coffee</span>
+                  </a>
+
                   <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-4">
                     I read Reddit, <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600">
@@ -158,7 +171,7 @@ export default function Home() {
                     </span>
                   </h1>
                   <p className="text-gray-400 text-lg">
-                    Built by a dev who searched for ideas, saw the feed and said “nahhhhh”....
+                    Built by a dev who searched, saw the feed and said “nahhhhh”
                   </p>
                 </motion.div>
               )}
