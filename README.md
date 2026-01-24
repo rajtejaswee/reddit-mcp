@@ -128,7 +128,7 @@ graph TD
 1. **Request Initiation** → User interacts with Next.js frontend
 2. **CDN Layer** → Vercel Edge Network serves static assets
 3. **API Gateway** → Express server validates and routes requests
-4. **Rate Limiting** → Token bucket checks prevent abuse
+4. **Rate Limiting** → Fixed Window strategy to throttle abusive traffic.
 5. **Cache Lookup** → Active Cache Strategy (Redis or Memory) → API Fallback
 6. **Response Caching** → Write-through strategy updates all cache tiers
 7. **Client Delivery** → Optimized JSON payload returned to browser
