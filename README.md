@@ -21,6 +21,12 @@
 
 ## 📖 Overview
 
+
+
+https://github.com/user-attachments/assets/d17db34c-3d67-4ec2-8402-d96b3ea0e0d0
+
+
+
 **Reddit MCP** is a production-grade engineering solution that transforms how users interact with Reddit's vast content ecosystem. By implementing the **Model Context Protocol (MCP)** architecture, it creates a clean separation between data context providers and presentation layers.
 
 This project goes beyond a simple API wrapper—it's a sophisticated middleware layer that intelligently orchestrates data flow, implements enterprise-grade caching strategies, and ensures privacy-first design principles.
