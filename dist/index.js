@@ -6,7 +6,7 @@ import { RedditService } from "./services/reddit.js";
 import { PublicClient } from "./services/publicClient.js"; // Ensure filename matches
 import { MemoryCache } from "./services/memoryCache.js";
 import { RedisCache } from "./services/redisCache.js";
-import { config } from "./config.js";
+import { config } from "./utils/config.js";
 import { logger } from "./utils/logger.js";
 // Initialize Dependencies
 const redditClient = new PublicClient();
