@@ -13,7 +13,7 @@
 
 **A privacy-focused, minimalist search engine for Reddit built with Model Context Protocol architecture**
 
-[View Live Demo](https://reddit-mcp.vercel.app) • [Report Bug](https://github.com/rajtejaswee/reddit-mcp/issues) • [Request Feature](https://github.com/rajtejaswee/reddit-mcp/issues)
+[View Live Demo](https://reddit-mcp-nine.vercel.app/) • [npm package](https://www.npmjs.com/package/@rajtejaswee/reddit-mcp) 
 
 </div>
 
