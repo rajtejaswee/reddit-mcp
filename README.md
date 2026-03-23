@@ -96,11 +96,11 @@ Modern social platforms suffer from:
 The system implements a **Microservices-Inspired Monorepo** with clear separation of concerns between compute and presentation layers.
 ```mermaid
 graph TD
-    User[👤 User / Client] -->|HTTPS Request| CDN[☁️ Vercel CDN]
-    CDN -->|Static Assets| Browser[🌐 Browser]
+    User[👤 User / Client] -->|Interacts with| Browser[🌐 Browser]
+    Browser -->|HTTPS Request| CDN[☁️ Vercel CDN]
+    CDN -->|Static Assets| Browser
     
-    Browser -->|API Call| LB[⚖️ Load Balancer<br/>Render]
-    LB -->|Route Traffic| Server[🚀 Express Server]
+    Browser -->|API Call| Server[🚀 Express Server]
     
     subgraph Backend["🔧 Backend Core (Node.js)"]
         Server -->|Middleware Chain| RateLimiter{🛡️ Rate Limit Check}
@@ -108,13 +108,15 @@ graph TD
         RateLimiter -- ✅ Allowed --> Service[📦 Reddit Service]
         
         Service -->|Query| CacheManager{💾 Cache Hit?}
-        CacheManager -- ✅ HIT --> Cache[(🔴 Redis / 💚 LRU Memory)]
         CacheManager -- ❌ MISS --> Fetcher[🌐 Reddit API Client]
     end
     
+    Cache[(🔴 Redis / 💚 LRU Memory)]
+    
+    CacheManager -- ✅ HIT --> Cache
     Fetcher -->|REST API| RedditAPI[🔴 Reddit Official API]
     RedditAPI -->|JSON Response| Fetcher
-    Fetcher -->|Write Through| Cache
+    Fetcher -->|Write| Cache
     Cache -->|Cached Data| Service
     Service -->|JSON Response| Browser
     
@@ -124,7 +126,7 @@ graph TD
     classDef external fill:#fef2f2,stroke:#b91c1c,stroke-width:2px,color:#450a0a;
     
     class User user;
-    class CDN,LB infra;
+    class Browser,CDN infra;
     class Server,Service,CacheManager,Cache,Fetcher backend;
     class RedditAPI external;
 ```
