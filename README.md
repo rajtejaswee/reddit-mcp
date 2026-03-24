@@ -13,13 +13,19 @@
 
 **A privacy-focused, minimalist search engine for Reddit built with Model Context Protocol architecture**
 
-[View Live Demo](https://reddit-mcp.vercel.app) • [Report Bug](https://github.com/rajtejaswee/reddit-mcp/issues) • [Request Feature](https://github.com/rajtejaswee/reddit-mcp/issues)
+[View Live Demo](https://reddit-mcp-nine.vercel.app/) • [npm package](https://www.npmjs.com/package/@rajtejaswee/reddit-mcp) 
 
 </div>
 
 ---
 
 ## 📖 Overview
+
+
+
+https://github.com/user-attachments/assets/d17db34c-3d67-4ec2-8402-d96b3ea0e0d0
+
+
 
 **Reddit MCP** is a production-grade engineering solution that transforms how users interact with Reddit's vast content ecosystem. By implementing the **Model Context Protocol (MCP)** architecture, it creates a clean separation between data context providers and presentation layers.
 
@@ -90,11 +96,11 @@ Modern social platforms suffer from:
 The system implements a **Microservices-Inspired Monorepo** with clear separation of concerns between compute and presentation layers.
 ```mermaid
 graph TD
-    User[👤 User / Client] -->|HTTPS Request| CDN[☁️ Vercel CDN]
-    CDN -->|Static Assets| Browser[🌐 Browser]
+    User[👤 User / Client] -->|Interacts with| Browser[🌐 Browser]
+    Browser -->|HTTPS Request| CDN[☁️ Vercel CDN]
+    CDN -->|Static Assets| Browser
     
-    Browser -->|API Call| LB[⚖️ Load Balancer<br/>Render]
-    LB -->|Route Traffic| Server[🚀 Express Server]
+    Browser -->|API Call| Server[🚀 Express Server]
     
     subgraph Backend["🔧 Backend Core (Node.js)"]
         Server -->|Middleware Chain| RateLimiter{🛡️ Rate Limit Check}
@@ -102,13 +108,15 @@ graph TD
         RateLimiter -- ✅ Allowed --> Service[📦 Reddit Service]
         
         Service -->|Query| CacheManager{💾 Cache Hit?}
-        CacheManager -- ✅ HIT --> Cache[(🔴 Redis / 💚 LRU Memory)]
         CacheManager -- ❌ MISS --> Fetcher[🌐 Reddit API Client]
     end
     
+    Cache[(🔴 Redis / 💚 LRU Memory)]
+    
+    CacheManager -- ✅ HIT --> Cache
     Fetcher -->|REST API| RedditAPI[🔴 Reddit Official API]
     RedditAPI -->|JSON Response| Fetcher
-    Fetcher -->|Write Through| Cache
+    Fetcher -->|Write| Cache
     Cache -->|Cached Data| Service
     Service -->|JSON Response| Browser
     
@@ -118,7 +126,7 @@ graph TD
     classDef external fill:#fef2f2,stroke:#b91c1c,stroke-width:2px,color:#450a0a;
     
     class User user;
-    class CDN,LB infra;
+    class Browser,CDN infra;
     class Server,Service,CacheManager,Cache,Fetcher backend;
     class RedditAPI external;
 ```
@@ -128,7 +136,7 @@ graph TD
 1. **Request Initiation** → User interacts with Next.js frontend
 2. **CDN Layer** → Vercel Edge Network serves static assets
 3. **API Gateway** → Express server validates and routes requests
-4. **Rate Limiting** → Token bucket checks prevent abuse
+4. **Rate Limiting** → Fixed Window strategy to throttle abusive traffic.
 5. **Cache Lookup** → Active Cache Strategy (Redis or Memory) → API Fallback
 6. **Response Caching** → Write-through strategy updates all cache tiers
 7. **Client Delivery** → Optimized JSON payload returned to browser
