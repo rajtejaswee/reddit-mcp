@@ -23,6 +23,7 @@ else {
 const service = new RedditService(client, cache);
 
 const app = express();
+app.set("trust proxy", 1);
 app.use(cors());
 
 const limiter = rateLimit({
@@ -41,8 +42,8 @@ app.get("/api/subreddit/:name", async (req, res) => {
         res.json({data: posts});
     }
     catch(error: any) {
-        logger.error({error: error.message}, "API Error");
-        res.status(500).json({ error: error.message });
+        logger.error({error: error?.message || error}, "API Error");
+        res.status(500).json({ error: error?.message || String(error) });
     }
 })
 
@@ -60,11 +61,11 @@ app.get("/api/search", async (req, res) => {
         res.json({ data: posts });
     }
     catch(error: any) {
-        logger.error({error: error.message}, "API Error");
-        if (error.message.includes("429")) {
+        logger.error({error: error?.message || error}, "API Error");
+        if (error?.message && String(error.message).includes("429")) {
              res.status(429).json({ error: "Reddit is overloaded. Try again in a minute." });
         } else {
-             res.status(500).json({ error: error.message });
+             res.status(500).json({ error: error?.message || String(error) });
         }
     }
 })
