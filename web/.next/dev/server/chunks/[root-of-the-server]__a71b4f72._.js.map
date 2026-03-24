@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 45, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":""}},
-    {"offset": {"line": 49, "column": 0}, "map": {"version":3,"sources":["file:///Users/rajtejaswee/reddit-mcp/web/app/icon--route-entry.js"],"sourcesContent":["import { NextResponse } from 'next/server'\nimport { default as handler } from \"./icon.tsx\"\n\nif (typeof handler !== 'function') {\n    throw new Error('Default export is missing in \"./icon.tsx\"')\n}\n\nexport async function GET(_, ctx) {\n    return handler({ params: ctx.params })\n}\n\nexport * from \"./icon.tsx\"\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEA,IAAI,OAAO,gIAAO,KAAK,YAAY;IAC/B,MAAM,IAAI,MAAM;AACpB;AAEO,eAAe,IAAI,CAAC,EAAE,GAAG;IAC5B,OAAO,IAAA,gIAAO,EAAC;QAAE,QAAQ,IAAI,MAAM;IAAC;AACxC"}}]
-}
